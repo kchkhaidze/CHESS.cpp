@@ -41,10 +41,10 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 	# register first wild type cell
 	firstCellID = 1
 	cellIDs[centre-1][centre-1] = firstCellID
-	cellDeadLive[centre-1][centre-1] = 1  
-	liveCellTypes[centre-1][centre-1] = 1 
+	cellDeadLive[centre-1][centre-1] = 1
+	liveCellTypes[centre-1][centre-1] = 1
 
-	# her corresponding entries in the phylogeny 
+	# her corresponding entries in the phylogeny
 	phylogeny.id[0] = 1
 
     # start with zero number of mutations
@@ -55,7 +55,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 	cellMutations.append([firstCellID])
 	cellMutations[firstCellID-1].append([totalMutCount + k for k in range(mutNum)])
 	totalMutCount += mutNum
-	
+
 	totalIdCount = 1
 
 	# initialize the condition for the while loop to commence and be running unless the condition changes
@@ -63,13 +63,13 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 
     # store total live cells per generation to plot growth curve
 	totalLiveCells = [1]
-    
+
     # store time steps passed per generation
 	time = [0]
 	timeIncrement = 0
 
 	converted = False
-    
+
     #random.seed(sd)
 	while(finish != 1):
 
@@ -77,11 +77,11 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 		generation += 1
 		# count total number of cells in wild type
 		wildCellCount = liveCellTypes[liveCellTypes == 1 ].size
-		
+
 		# get next time interval for wild reaction
 		wildReaction = np.log(1/np.random.uniform())/(wildCellCount*wildBirthRate)
 
-		
+
 		if time[len(time)-1] >= cloneStartTime and not converted:
 
 			print('converting: blue ----------> red')
@@ -113,16 +113,16 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 				cellType = 2
 				timeIncrement = mutantReaction
 		else:
-			
+
 			cellType = 1
 			timeIncrement = wildReaction
 
-		
+
 
         # increment time
 		time.append(time[len(time)-1] + timeIncrement)
 
-		# pick up uniformly which particular cell to divide next within a chosen reaction 
+		# pick up uniformly which particular cell to divide next within a chosen reaction
 		curTypeCellCoords = np.where(liveCellTypes == cellType)
 		curTypeCellCount = curTypeCellCoords[0].size
 
@@ -146,7 +146,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 
 				xtemp = xtemp[0]
 				ytemp = ytemp[0]
-				 
+
 				# store neighbourhood coordinates of the father cell
 				neighbourCoords = sum([[xtemp, ytemp, 0,\
 										xtemp + 1, ytemp, 0,\
@@ -155,7 +155,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 										xtemp, ytemp - 1, 0,\
 										xtemp + 1, ytemp - 1, 0,\
 										xtemp - 1, ytemp - 1, 0,\
-										
+
 										xtemp, ytemp + 1, 0,\
 										xtemp + 1, ytemp + 1, 0,\
 										xtemp - 1, ytemp + 1, 0]], [])
@@ -177,11 +177,11 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 							freeCoords = np.vstack([freeCoords, [neighbourCoords[j][0], neighbourCoords[j][1], neighbourCoords[j][2]]])
 						else:
 							neighbourFullSpace += 1
-		        
+
 		            # remove the empty first row (needed for vstack)
 				freeCoords = np.delete(freeCoords, 0, 0)
 
-				# if there is a space in the father cell neighbourhood: 
+				# if there is a space in the father cell neighbourhood:
 				if neighbourFullSpace < neighbourCoords.shape[0] - spaceCorrection:
 					# check if any of the spaces from squares and diagonals are empty (ie not in the freeCoords array)
 					pickedSpace = np.random.permutation(len(freeCoords))[0]
@@ -197,7 +197,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 					phylogeny.loc[phylogeny.id == fatherID, 'd2'] = currD2Id
 					phylogeny.loc[phylogeny.id == fatherID, 'type'] = cellType
 					phylogeny = phylogeny.append(pd.DataFrame([[currD1Id, fatherID, 0, 0, 0, cellType], [currD2Id, fatherID, 0, 0, 0, cellType]], columns = ['id', 'f', 'd1','d2','dead', 'type']))
-					
+
 					# store both daughters' IDs, their states and types in the corresponding 3D grids
 					# first daughter is registered over the father's space
 					cellIDs[xtemp][ytemp] = currD1Id
@@ -237,8 +237,8 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 						cellMutations[currD2Id-1].append([totalMutCount + k for k in range(mutNum)])
 						totalMutCount += mutNum
 				else:
-					# if there is no free space in the father cell's neighbourhood, with the probability cellAggression shift all the cells 
-					# from father cell till the first  empty space going in a random direction by one unit towards the grid bourders 
+					# if there is no free space in the father cell's neighbourhood, with the probability cellAggression shift all the cells
+					# from father cell till the first  empty space going in a random direction by one unit towards the grid bourders
 					aggression = np.random.uniform(0,1,1)[0]
 					if aggression < cellAggression:
 						x = 2*np.random.uniform(0,1,1)[0] - 1
@@ -266,8 +266,8 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 										cellIDs[int(round(xtemp + s*dx))][int(round(ytemp + s*dy))] = cellIDs[int(round(xtemp + (s-1)*dx))][int(round(ytemp + (s-1)*dy))]
 										cellDeadLive[int(round(xtemp + s*dx))][int(round(ytemp + s*dy))] = cellDeadLive[int(round(xtemp + (s-1)*dx))][int(round(ytemp + (s-1)*dy))]
 										liveCellTypes[int(round(xtemp + s*dx))][int(round(ytemp + s*dy))] = liveCellTypes[int(round(xtemp + (s-1)*dx))][int(round(ytemp + (s-1)*dy))]
-							
-							# if shifting finishes successfully, take over the space of the 'first' cell (meaning closest to the father cell) shifted 
+
+							# if shifting finishes successfully, take over the space of the 'first' cell (meaning closest to the father cell) shifted
 							xtest = int(round(xtemp + shift*dx))
 							ytest = int(round(ytemp + shift*dy))
 
@@ -280,7 +280,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 							phylogeny.loc[phylogeny.id == fatherID, 'd2'] = currD2Id
 							phylogeny.loc[phylogeny.id == fatherID, 'type'] = cellType
 							phylogeny = phylogeny.append(pd.DataFrame([[currD1Id, fatherID, 0, 0, 0, cellType], [currD2Id, fatherID, 0, 0, 0, cellType]], columns = ['id', 'f', 'd1','d2','dead', 'type']))
-							
+
 							# store both daughters' IDs and their states in the corresponding 3D grids
 					            # first daughter is registered over the father's space
 							cellIDs[xtemp][ytemp] = currD1Id
@@ -291,7 +291,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 							cellIDs[int(round(xtemp + dx))][int(round(ytemp + dy))] = currD2Id
 							cellDeadLive[int(round(xtemp + dx))][int(round(ytemp + dy))] = 1
 							liveCellTypes[int(round(xtemp + dx))][int(round(ytemp + dy))] = 1 if cellType == 1 else 2
-							
+
 							# increase total ID count by two
 							totalIdCount += 2
 
@@ -317,7 +317,7 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 								cellMutations.append([currD2Id])
 								cellMutations[currD2Id-1].append([totalMutCount + k for k in range(mutNum)])
 								totalMutCount += mutNum
-			
+
 		# count current live cells
 		curLiveCells = np.size(cellDeadLive[np.nonzero(cellDeadLive)])
 
@@ -326,14 +326,14 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 		# check if the currently uccupied space is on the grid boundary and if so, stop the growth
 		if xtest == grid_size or ytest == grid_size or xtest == 1 or ytest == 1:
 			finish = 1 # finishing the growth
-		
+
 
 	# store current generation count and the total number of mutations within it
 	globalMutations = np.vstack((globalMutations, [generation, totalMutCount]))
 
 	globalMutations = np.delete(globalMutations, 0, 0)
 
-	globalMutations = pd.DataFrame(globalMutations, columns = ['gen', 'mutCount']) 
+	globalMutations = pd.DataFrame(globalMutations, columns = ['gen', 'mutCount'])
 
 	totalLiveCells = pd.DataFrame(totalLiveCells, columns = ['cell_count'])
 
@@ -380,4 +380,3 @@ def simulateTumorGrowth2D(sd, grid_size, mu, wildBirthRate, mutantBirthRate, alp
 
 
 simulateTumorGrowth2D(sd = 1, grid_size = 50, mu = 10, wildBirthRate = 1, mutantBirthRate = 2, alpha = 0, beta = 1, cellAggression = 1, cloneStartTime = 5)
-
