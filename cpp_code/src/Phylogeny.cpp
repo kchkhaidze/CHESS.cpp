@@ -1,4 +1,3 @@
-/*
 //#define DEBUG
 #ifdef DEBUG
 #define D(x) x
@@ -6,36 +5,114 @@
 #define D(x)
 #endif
 
+#include "Phylogeny.hpp"
 #include "Cell.hpp"
-#include <random>
 #include <iostream>
 
-// Phylogeny_Node //////////////////////////////////////////////////////////////
+// PhylogenyRoot ///////////////////////////////////////////////////////////////
 
 // Statics:
-int Phylogeny_Node::N = 0;
-int Phylogeny_Node::next_id = 1;
+unsigned int PhylogenyRoot::msNextId = 0;
 
+// Constructor:
+PhylogenyRoot::PhylogenyRoot(Cell* pCell) : mId(msNextId++) {
+  mpRoot = new PhylogenyNode(pCell);
+}
+
+PhylogenyNode* PhylogenyRoot::Root(){ return mpRoot; }
+
+// PhylogenyNode ///////////////////////////////////////////////////////////////
+
+// Statics:
+unsigned int PhylogenyNode::msNextId = 0;
 
 // Constructors
-Phylogeny_Node::Phylogeny_Node(Cell *cell) // Create root node with a cell.
-: cell(cell), up(0), left(0), right(0), gen(0), n_muts_gen(0)  {
+PhylogenyNode::PhylogenyNode(Cell* pCell) //
+  : mId(msNextId++),
+    mpCell(pCell),
+    mpUp(0),
+    mpLeft(0),
+    mpRight(0),
+    mGeneration(1),
+    mNumMutsGeneration(0)
+  {
+    if (pCell->AssociatedNode() != 0) {
+      pCell->AssociatedNode()->AssociatedCell(0);
+    }
+    pCell->AssociatedNode(this);
+  }
+
+PhylogenyNode::PhylogenyNode(Cell* pCell, PhylogenyNode* pUp)
+  : mId(msNextId++),
+  mpCell(pCell),
+  mpUp(pUp),
+  mpLeft(0),
+  mpRight(0),
+  mNumMutsGeneration(0)
+  {
+    mGeneration = pUp->Generation() + 1;
+    if (pCell->AssociatedNode() != 0) {
+      pCell->AssociatedNode()->AssociatedCell(0);
+    }
+    pCell->AssociatedNode(this);
+  }
+
+// Getters:
+unsigned int PhylogenyNode::Id() { return mId; };
+unsigned int PhylogenyNode::Generation(){ return mGeneration; }
+unsigned int PhylogenyNode::NumMutations(){ return mNumMutsGeneration; }
+Cell* PhylogenyNode::AssociatedCell() { return mpCell; };
+PhylogenyNode* PhylogenyNode::UpNode() { return mpUp; };
+PhylogenyNode* PhylogenyNode::LeftNode() { return mpLeft; };
+PhylogenyNode* PhylogenyNode::RightNode() { return mpRight; };
+
+// Setters:
+void PhylogenyNode::AddNewMutations(int num_new_mutations) {
+  mNumMutsGeneration += num_new_mutations;
 }
 
-Phylogeny_Node::Phylogeny_Node(Cell *cell, Phylogeny_Node *up)
-: cell(cell), up(up), left(0), right(0) {
+void PhylogenyNode::AssociatedCell(Cell* pCell) { mpCell = pCell; }
+
+void PhylogenyNode::UpNode(PhylogenyNode* pNode) {mpUp = pNode;};
+void PhylogenyNode::LeftNode(PhylogenyNode* pNode) {mpLeft = pNode;};
+void PhylogenyNode::RightNode(PhylogenyNode* pNode) {mpRight = pNode;};
+
+
+
+// Output:
+void PhylogenyNode::Print() {
+  unsigned int up = (mpUp == 0) ? 0 : mpUp->Id();
+  unsigned int left = (mpLeft == 0) ? 0 : mpLeft->Id();
+  unsigned int right = (mpRight == 0) ? 0 : mpRight->Id();
+
+  std::cout << "###### Phylogenetic Node ######" << std::endl;
+  std::cout << "   ID: " << mId << std::endl;
+  std::cout << "   Up: " << up << std::endl;
+  std::cout << "   Left: " << left << std::endl;
+  std::cout << "   Right: " << right << std::endl;
+  std::cout << "   Generation: " << mGeneration << std::endl;
+  std::cout << "   Mutations: " << mNumMutsGeneration << std::endl;
+  if (mpCell != 0) { std::cout << "   Cell: " << mpCell << std::endl; }
+  std::cout << "###############################" << std::endl;
 }
 
-// Functions:
-void Phylogeny_Node::record_new_muts(int n) {
-  n_muts_gen+=n;
-  cum_sum_muts+=n;
+void PhylogenyNode::PrintAncestry() {
+
+  if (mpCell != 0) { // If this is a leaf
+    std::cout << std::endl;
+    std::cout << "###### Ancestry of cell #######" << std::endl;
+    std::cout << "  Cell ID: " << mpCell->Id() << std::endl;
+    std::cout << std::endl;
+  }
+
+  this->Print();
+
+  if (mpUp != 0) { // If next is not root
+    std::cout << "              | " << std::endl;
+    std::cout << "              | " << std::endl;
+    mpUp->PrintAncestry();
+  } else {
+    std::cout << std::endl;
+    std::cout << "###############################" << std::endl;
+  }
 }
-
-
-
-// Constructors:
-Phylogeny::Phylogeny(Cell *cell) { // Create root node with cell.
-  root = new Phylogeny_Node(cell);
-}
-*/

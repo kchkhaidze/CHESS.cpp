@@ -4,6 +4,8 @@
 // Forward declerations: ///////////////////////////////////////////////////////
 class CellType;
 class Universe;
+class PhylogenyNode;
+
 //class Phylogeny_Node;
 
 // Includes: ///////////////////////////////////////////////////////////////////
@@ -24,7 +26,7 @@ class Cell {
 
     // Properties:
     CellType* mpType;
-  //Phylogeny_Node *node;
+    PhylogenyNode* mpNode;
 
   public:
     // Constructors:
@@ -40,18 +42,21 @@ class Cell {
     bool AsProgenitorDies();
     bool AsOffspringDies();
     bool TriesPush();
+    PhylogenyNode* AssociatedNode();
 
     // Setter functions:
     void Location(Universe*, int, int, int);
     void Location(int, int, int);
     void Type(CellType*);
-
+    void AssociatedNode(PhylogenyNode*);
 
     // Other functions:
-    void MutateCell(double);
+    void MutateCell();
+    void MutateCell(float);
     void Print();
     void Divide();
     bool RandomPush(int&, int&, int&);
+
 };
 
 #endif // CELL_H

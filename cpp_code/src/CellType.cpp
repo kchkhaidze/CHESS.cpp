@@ -22,6 +22,7 @@ CellType::CellType () // Default definition of no death and aggression.
     mAlpha(0.0),
     mBeta(1.0),
     mAggression(0.0),
+    mMu(1.0),
     mPushPower(INT_MAX),
     mNumMembers(0),
     mpMembers(0)
@@ -29,12 +30,14 @@ CellType::CellType () // Default definition of no death and aggression.
     mColor[0] = 255; mColor[1] = 255; mColor[2] = 255;
   }
 
-CellType::CellType (float birthrate, float alpha, float beta, float aggression) // Full exp. def.
+CellType::CellType (float birthrate, float alpha, float beta, float aggression,
+                    float mu) // Full exp. def.
   : mId(msNextId++),
     mBirthRate(birthrate),
     mAlpha(alpha),
     mBeta(beta),
     mAggression(aggression),
+    mMu(mu),
     mPushPower(INT_MAX),
     mNumMembers(0),
     mpMembers(0)
@@ -43,12 +46,14 @@ CellType::CellType (float birthrate, float alpha, float beta, float aggression) 
     }
 
 CellType::CellType(float birthrate, float alpha, float beta, float aggression,
-                   unsigned char red, unsigned char blue, unsigned  char green)
+                   float mu, unsigned char red, unsigned char blue,
+                   unsigned char green)
     : mId(msNextId++),
       mBirthRate(birthrate),
       mAlpha(alpha),
       mBeta(beta),
       mAggression(aggression),
+      mMu(mu),
       mPushPower(INT_MAX),
       mNumMembers(0),
       mpMembers(0)
@@ -65,6 +70,7 @@ float CellType::Birthrate(){return mBirthRate;}
 float CellType::Alpha(){return mAlpha;};
 float CellType::Beta(){return mBeta;};
 float CellType::Aggression(){return mAggression;};
+float CellType::Mu(){return mMu;};
 unsigned int CellType::PushPower(){return mPushPower;};
 
 unsigned char* CellType::Color(){return mColor;};

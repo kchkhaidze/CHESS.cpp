@@ -15,6 +15,8 @@
 #include <random>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <vector>
 #include "boost/multi_array.hpp"
 #include <iostream>
@@ -29,8 +31,8 @@
 
 
 // Params of old function simulateTumorGrowth2D
-#define SIZE_X 500 // size of the space [int]
-#define SIZE_Y 500 // size of the space [int]
+#define SIZE_X 50 // size of the space [int]
+#define SIZE_Y 50 // size of the space [int]
 #define SIZE_Z 1 // size of the space [int]
 #define MU 10          // mutation rate [int]
 #define SD 1           // [int]
@@ -44,6 +46,8 @@
 #define CENTER(X) ((X + 1) / 2) - 1
 #define SPACE_OUPUT_FILE_PREFIX "output/space"
 #define TYPES_OUPUT_FILE_PREFIX "output/types"
+#define PHYLO_OUPUT_FILE_PREFIX "output/phylo"
+#define HISTORY_OUPUT_FILE_PREFIX "output/cell_number.csv"
 
 int main() {
 
@@ -63,16 +67,16 @@ int main() {
   Cell* p_cell;
 
   // Create two cell types (red and blue):
-  CellType cell_type_blue(WTBR, ALPHA, BETA, AGGR, 0, 255, 0);
-  CellType cell_type_red(MUTBR, ALPHA, BETA, AGGR, 255, 0, 0);
+  CellType cell_type_blue(WTBR, ALPHA, BETA, AGGR, MU, 0, 255, 0);
+  CellType cell_type_red(MUTBR, ALPHA, BETA, AGGR, MU, 255, 0, 0);
 
   // Create and insert a new blue cell:
   p_cell = new Cell(&cell_type_blue);
   universe.InsertCell(CENTER(SIZE_X), CENTER(SIZE_Y), CENTER(SIZE_Z), p_cell);
 
   // Use these vectors to track number of alive cells during each cyle:
-  std::vector<int> track_time_gen, track_cells_blue, track_cells_red;
-
+  std::vector<float> track_time_gen;
+  std::vector<int> track_cells_blue, track_cells_red;
 
   // Run till insertion of new cell type after CLST should occure:
   while(universe.Time() <= CLST && !universe.LimitIsReached()) {
@@ -123,16 +127,28 @@ int main() {
   } // stop running after reaching limit of universe
 
 
+  cell_type_blue.RandomMember()->AssociatedNode()->PrintAncestry();
+
+
   // Write all results to output files:
   std::cerr << "Dumping output" << std::endl;
   universe.SpaceToCsvFile(SPACE_OUPUT_FILE_PREFIX);
   universe.TypesToCsvFile(TYPES_OUPUT_FILE_PREFIX);
+  universe.PhylogeniesToFile(PHYLO_OUPUT_FILE_PREFIX);
 
-  //
-  track_time_gen.push_back(universe.Time());
-  track_cells_blue.push_back(cell_type_blue.NumMembers());
-  track_cells_red.push_back(cell_type_red.NumMembers());
+  // Write history to another output file:
+  std::ofstream output_stream;
+  output_stream.open(HISTORY_OUPUT_FILE_PREFIX, std::ios::out | std::ios::trunc);
 
-
+  if (output_stream.is_open()) {
+    output_stream << "time,blue_cells,red_cells" << std::endl;
+    for(std::vector<float>::size_type i = 0; i < track_time_gen.size(); i++) {
+      output_stream << track_time_gen[i] << ","
+        << track_cells_blue[i] << "," << track_cells_red[i] << std::endl;
+    }
+    output_stream.close();
+  } else {
+    std::cerr << "Couldn't write histroy to csv file." << std::endl;
+  }
   return EXIT_SUCCESS;
 }

@@ -8,8 +8,10 @@
 #include "CellType.hpp"
 #include "Cell.hpp"
 #include "Universe.hpp"
+#include "Phylogeny.hpp"
 //#include <random>
 #include <iostream>
+#include <string>
 #include <array>
 #include <vector>
 #include <fstream>
@@ -180,7 +182,7 @@ bool Universe::InsertCell(int x, int y, int z, Cell* pCell) {
 }
 
 bool Universe::InsertCell(int x, int y, int z, Cell* pCell,
-                          bool do_type_registration){
+                          bool is_new_lineage){
 
   // Debug messages:
   D(std::cout << std::endl;)
@@ -215,7 +217,7 @@ bool Universe::InsertCell(int x, int y, int z, Cell* pCell,
   }
 
   // Insert type into universe
-  if (do_type_registration) {
+  if (is_new_lineage) {
     this->RegisterType(pCell->Type());
   }
 
@@ -225,8 +227,11 @@ bool Universe::InsertCell(int x, int y, int z, Cell* pCell,
   // Update universe:
   mSpace[x][y][z] = pCell;
 
-  // :ToDo: Somehow register in the phylogeny as new phylo!
-  //phylos.push_back = new Phylogeny(cell->get_id());
+  // Register new phylogeny:
+  if (pCell->AssociatedNode() == 0) {
+    PhylogenyRoot* pNewPhylo = new PhylogenyRoot(pCell);
+    mpPhylogenies.push_back(pNewPhylo);
+  }
 
   return true;
 }
@@ -331,7 +336,7 @@ void Universe::TypesToCsvFile(std::string out_prefix) {
   output_stream.open(outfile_name, std::ios::out | std::ios::trunc);
 
   if (output_stream.is_open()) {
-    output_stream << "ID,birthrate,alpha,beta,aggression,pushpower,N"
+    output_stream << "ID,birthrate,alpha,beta,aggression,mu,pushpower,N"
       << std::endl;
 
     for(std::vector<CellType *>::size_type i = 0; i < mpTypes.size(); i++) {
@@ -340,6 +345,7 @@ void Universe::TypesToCsvFile(std::string out_prefix) {
         << std::to_string(mpTypes[i]->Alpha()) << ","
         << std::to_string(mpTypes[i]->Beta()) << ","
         << std::to_string(mpTypes[i]->Aggression()) << ","
+        << std::to_string(mpTypes[i]->Mu()) << ","
         << std::to_string(mpTypes[i]->PushPower()) << ","
         << std::to_string(mpTypes[i]->NumMembers()) << std::endl;
     }
@@ -349,9 +355,61 @@ void Universe::TypesToCsvFile(std::string out_prefix) {
   }
 }
 
-void Universe::PhylogeniesToCsvFiles(std::string out_prefix) {}
+void Universe::PutNodesToStream(PhylogenyNode* current_node,
+                                std::ofstream& outstream) {
+  // Print this node:
+  //PhylogenyNode* up = current_node->UpNode();
+  PhylogenyNode* left = current_node->LeftNode();
+  PhylogenyNode* right = current_node->RightNode();
+  Cell* cell = current_node->AssociatedCell();
+  //unsigned int up_id = (up == 0) ? 0 : up->Id();
+  //unsigned int left_id = (left == 0) ? 0 : left->Id();
+  //unsigned int right_id = (right == 0) ? 0 : right->Id();
+  //unsigned int cell_id = (cell == 0) ? 0 : cell->Id();
+
+  //  outstream << current_node->Id() <<  up_id << "," << left_id << ","
+  //  << right_id <<  "," << current_node->Generation() << ","
+  //  << current_node->NumMutations() << "," << cell_id << "," << std::endl;
+
+  std::string spacer =  std::string(current_node->Generation(), ' ');
+  if (cell != 0) { // "Print as Leaf"
+    outstream << spacer << current_node->Id() << ":" << current_node->NumMutations();
+  }  else { // Print as node?
+    outstream << spacer << "(" << std::endl;
+    if (left != 0) {
+      PutNodesToStream(left, outstream);
+      outstream << "," << std::endl;
+    }
+    if (right != 0){
+      PutNodesToStream(right, outstream);
+      outstream << std::endl;
+    }
+    outstream << spacer << "):" << current_node->NumMutations();
+  }
+}
+
+void Universe::PhylogeniesToFile(std::string out_prefix) {
+  std::string suffix = ".tree";
+  std::ofstream output_stream;
+  std::string outfile_name;
+
+  for(std::vector<PhylogenyRoot*>::size_type i=0; i<mpPhylogenies.size(); i++) {
 
 
+      outfile_name = out_prefix + "_phylogeny_" + std::to_string(i) + suffix;
+      output_stream.open(outfile_name, std::ios::out | std::ios::trunc);
+
+      if (output_stream.is_open()) {
+        //output_stream << "id,up,left,right,gen,num_muts,cell" << std::endl;
+        PhylogenyNode* current_node = mpPhylogenies[i]->Root();
+        PutNodesToStream(current_node, output_stream);
+        output_stream << std::endl;
+      } else {
+        std::cerr << "Couldn't write space to csv file." << std::endl;
+      }
+    output_stream.close();
+  }
+}
 
 
 // Other functions:

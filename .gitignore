@@ -1,2 +1,3 @@
 *.o
 cpp_code/cancer_gillespie_simulation
+cpp_code/cancer_gillespie_simulation.*

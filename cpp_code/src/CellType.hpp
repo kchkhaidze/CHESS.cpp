@@ -21,6 +21,7 @@ class CellType {
     float mAlpha;
     float mBeta;
     float mAggression;
+    float mMu;
     unsigned int mPushPower;
     unsigned char mColor[3];
 
@@ -31,8 +32,8 @@ class CellType {
   public:
     // Constructors:
     CellType();
-    CellType(float, float, float, float);
-    CellType(float, float, float, float, unsigned char, unsigned char,
+    CellType(float, float, float, float, float);
+    CellType(float, float, float, float, float, unsigned char, unsigned char,
              unsigned char);
 
     // Destructor:
@@ -43,6 +44,7 @@ class CellType {
     float Alpha();
     float Beta();
     float Aggression();
+    float Mu();
     unsigned int PushPower();
     unsigned char* Color();
     unsigned long NumMembers();

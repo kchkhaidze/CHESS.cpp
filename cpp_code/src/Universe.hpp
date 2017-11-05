@@ -5,6 +5,7 @@
 //class Phylogeny_Node;
 class Cell;
 class CellType;
+class PhylogenyRoot;
 
 // Includes: ///////////////////////////////////////////////////////////////////
 #include <vector>
@@ -17,7 +18,7 @@ class Universe {
     float mTime;
     boost::multi_array<Cell*, 3> mSpace; // the space
     std::vector<CellType*> mpTypes;
-    //std::vector<Phylogeny> phylos;
+    std::vector<PhylogenyRoot*> mpPhylogenies;
     bool mLimitReached;
   public:
     // Constructor:
@@ -49,7 +50,8 @@ class Universe {
                  cimg_library::CImgDisplay*);
     void SpaceToCsvFile(std::string);
     void TypesToCsvFile(std::string);
-    void PhylogeniesToCsvFiles(std::string);
+    void PutNodesToStream(PhylogenyNode*, std::ofstream&);
+    void PhylogeniesToFile(std::string);
 
     // Other functions:
     bool PushCell(int, int, int, int, int, int, unsigned int);

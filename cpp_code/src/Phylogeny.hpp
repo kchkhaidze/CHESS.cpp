@@ -1,9 +1,9 @@
 #ifndef PHYLOGENY_H
 #define PHYLOGENY_H
 
-/*
+
 // Forward declerations: ///////////////////////////////////////////////////////
-class Phylogeny_Node;
+class PhylogenyNode;
 class Cell;
 class Universe;
 
@@ -14,29 +14,55 @@ class Universe;
 
 // Phylo ///////////////////////////////////////////////////////////////////////
 
-class Phylogeny_Node {
-  static int N, next_id;
-  Cell *cell;
-  Phylogeny_Node *up, *left, *right;
-  int gen;
-  int n_muts_gen, cum_sum_muts;
+class PhylogenyRoot {
+    const unsigned int mId;
+    static unsigned int msNextId; // Increments from one.
+    PhylogenyNode* mpRoot;
 
   public:
-    // Constructors
-    Phylogeny_Node(Cell *cell);
-    Phylogeny_Node(Cell *cell, Phylogeny_Node *up);
-    // Functions
-    void record_new_muts(int n);
+    //Constructor
+    PhylogenyRoot(Cell*); // Create root node with cell.
+    PhylogenyNode* Root();
 };
 
-class Phylogeny {
-  int id;
-  Phylogeny_Node *root;
+
+class PhylogenyNode {
+  const unsigned int mId;
+  static unsigned int msNextId; // Increments from one.
+
+  Cell* mpCell;
+  PhylogenyNode* mpUp;
+  PhylogenyNode* mpLeft;
+  PhylogenyNode* mpRight;
+
+  unsigned int mGeneration;
+  unsigned int mNumMutsGeneration;
 
   public:
-    Phylogeny(Cell *cell); // Create root node with cell.
-};
+    // Constructors:
+    PhylogenyNode(Cell*);
+    PhylogenyNode(Cell*, PhylogenyNode*);
 
-*/
+    // Getters:
+    unsigned int Id();
+    unsigned int Generation();
+    unsigned int NumMutations();
+    Cell* AssociatedCell();
+    PhylogenyNode* UpNode();
+    PhylogenyNode* LeftNode();
+    PhylogenyNode* RightNode();
+
+    // Setters:
+    void AddNewMutations(int);
+    void AssociatedCell(Cell*);
+    void UpNode(PhylogenyNode*);
+    void LeftNode(PhylogenyNode*);
+    void RightNode(PhylogenyNode*);
+
+    // Output:
+    void Print();
+    void PrintAncestry();
+
+};
 
 #endif // PHYLOGENY_H

@@ -7,6 +7,7 @@
 
 #include "Cell.hpp"
 #include "CellType.hpp"
+#include "Phylogeny.hpp"
 #include "Universe.hpp"
 #include <random>
 #include <iostream>
@@ -20,19 +21,34 @@ unsigned int Cell::msNextId = 1;
 
 // Constructors:
 Cell::Cell () // Default definition without location and types.
-  : mId(msNextId++), mpUniverse(0), mX(0), mY(0), mZ(0), mpType(0)
+  : mId(msNextId++),
+    mpUniverse(0),
+    mX(0),
+    mY(0),
+    mZ(0),
+    mpType(0),
+    mpNode(0)
   {}
 
 Cell::Cell (CellType* pType) // Defaults except of cell type.
-  : mId(msNextId++), mpUniverse(0), mX(0), mY(0), mZ(0), mpType(pType){
+  : mId(msNextId++),
+    mpUniverse(0),
+    mX(0),
+    mY(0),
+    mZ(0),
+    mpType(pType),
+    mpNode(0)
+  {
     mpType->RegisterMember(this);
   }
+
 
 // Destructor:
 Cell::~Cell(){ // Proper deletion of a cell.
   D(std::cout << "Cell " << mId << " dies!" << std::cout;)
   mpType->RegisterMember(this);
   mpUniverse->RemoveCell(mX, mY, mZ);
+  mpNode->AssociatedCell(0);
 }
 
 
@@ -52,14 +68,15 @@ bool Cell::TriesPush() {
   return ((double) rand() / (RAND_MAX)) <= mpType->Aggression();
 }
 
+PhylogenyNode* Cell::AssociatedNode() {return mpNode;};
+
+
 // Setter functions:
 void Cell::Location(Universe *pUniverse, int X, int Y, int Z) {
   mpUniverse = pUniverse; mX = X; mY = Y; mZ = Z;
 }
 
-void Cell::Location(int X, int Y, int Z) {
-  mX = X; mY = Y; mZ = Z;
-}
+void Cell::Location(int X, int Y, int Z) { mX = X; mY = Y; mZ = Z; }
 
 void Cell::Type(CellType* pNewType) {
   mpUniverse->RegisterType(pNewType);
@@ -68,21 +85,24 @@ void Cell::Type(CellType* pNewType) {
   mpType = pNewType;
 };
 
+void Cell::AssociatedNode(PhylogenyNode* new_node) { mpNode = new_node; };
+
 
 // Other functions:
-void Cell::MutateCell(double Mu){
-  //:ToDo: Implement mutations of cells!
-  std::cerr << "Mutation of cells not defined. exit" << std::endl;
-  exit(EXIT_FAILURE);
-  /*// Sample number of new muts from poisson:
+void Cell::MutateCell() {
+  Cell::MutateCell(mpType->Mu());
+}
+
+void Cell::MutateCell(float mu){
+  //:ToDo: Reimplement mutations of cells!
+  // Sample number of new muts from poisson:
   std::random_device rd;
   std::mt19937 gen(rd());
   std::poisson_distribution<> d(mu);
   int new_muts = d(gen);
 
   // Append muts to node:
-  node->record_new_muts(new_muts);
-  // Get the phylo, update the mutation numbers, etc.*/
+  mpNode->AddNewMutations(new_muts);
 }
 
 
@@ -123,6 +143,12 @@ void Cell::Divide() {
     D(std::cout << "###############################" << std::endl;)
     delete this;
   } else {
+    // Store current associated node, then branch to the left and mutate:
+    PhylogenyNode* old_node = this->mpNode;
+    PhylogenyNode* new_left_node = new PhylogenyNode(this, old_node);
+    old_node->LeftNode(new_left_node);
+    this->MutateCell();
+
     // Get all free spaces around current pos:
     int new_x, new_y, new_z;
     std::vector< std::array<int, 3> > free_neighbours;
@@ -151,10 +177,14 @@ void Cell::Divide() {
     D(std::cout << "  Choosen location:" << std::endl;)
     D(std::cout << "    x: " << new_x;)
     D(std::cout << "    y: " << new_y;)
-    D(std::cout << "    z: " << new_z;)
+    D(std::cout << "    z: " << new_z << std::endl;)
 
     Cell* pDaughter = new Cell(mpType);
+    PhylogenyNode* new_right_node = new PhylogenyNode(pDaughter, old_node);
+    old_node->RightNode(new_right_node);
     mpUniverse->InsertCell(new_x, new_y, new_z, pDaughter, false);
+    pDaughter->MutateCell();
+
 
     if (pDaughter->AsOffspringDies()) {
       D(std::cout << " Daughter died" << std::endl;)
