@@ -98,10 +98,11 @@ void PhylogenyNode::Print() {
 
 void PhylogenyNode::PrintAncestry() {
 
-  if (mpCell != 0) { // If this is a leaf
+  if (mpLeft == 0 && mpRight == 0) { // If this is a leaf
+    std::string cell_id = (mpCell == 0) ? "NA" : std::to_string(mpCell->Id());
     std::cout << std::endl;
     std::cout << "###### Ancestry of cell #######" << std::endl;
-    std::cout << "  Cell ID: " << mpCell->Id() << std::endl;
+    std::cout << "  Cell ID: " << cell_id << std::endl;
     std::cout << std::endl;
   }
 

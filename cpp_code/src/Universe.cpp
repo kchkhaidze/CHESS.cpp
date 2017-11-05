@@ -372,7 +372,7 @@ void Universe::PutNodesToStream(PhylogenyNode* current_node,
   //  << current_node->NumMutations() << "," << cell_id << "," << std::endl;
 
   std::string spacer =  std::string(current_node->Generation(), ' ');
-  if (cell != 0) { // "Print as Leaf"
+  if (left == 0 && right == 0) { // "Print as Leaf"
     outstream << spacer << current_node->Id() << ":" << current_node->NumMutations();
   }  else { // Print as node?
     outstream << spacer << "(" << std::endl;
