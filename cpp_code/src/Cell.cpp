@@ -46,7 +46,7 @@ Cell::Cell (CellType* pType) // Defaults except of cell type.
 // Destructor:
 Cell::~Cell(){ // Proper deletion of a cell.
   D(std::cout << "Cell " << mId << " dies!" << std::cout;)
-  mpType->RegisterMember(this);
+  mpType->DeregisterMember(this);
   mpUniverse->RemoveCell(mX, mY, mZ);
   mpNode->AssociatedCell(0);
 }
