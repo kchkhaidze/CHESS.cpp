@@ -49,7 +49,13 @@
 #define PHYLO_OUPUT_FILE_PREFIX "output/phylo"
 #define HISTORY_OUPUT_FILE_PREFIX "output/cell_number.csv"
 
-int main() {
+int main(int argc, char* argv[]) {
+
+  // example interface
+  for (int i = 0; i < argc; i++) {
+    std::cout << "argv[" << i << "] " << argv[i] << std::endl;
+  }
+  int size_x = argv[1];
 
   // randomize seed
   time_t seed = time(NULL);
