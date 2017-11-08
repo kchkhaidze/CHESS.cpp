@@ -332,6 +332,19 @@ int main(int argc, char* argv[]) {
 
 
   cell_type_blue.RandomMember()->AssociatedNode()->PrintAncestry();
+  // Example how to take samples:
+  std::vector <std::string> sample_ids;
+  std::vector <float> sample_vafs;
+  Shape* square = new Box(40, 40, 0, 60, 60, 0);
+  universe.TakeSample(square, sample_ids, sample_vafs);
+
+  std::vector<std::string>::size_type i_a;
+  std::vector<float>::size_type i_b;
+
+  for(i_a = 0, i_b = 0; i_a < sample_ids.size() && i_b < sample_vafs.size();
+      i_a++, i_b++) {
+    std::cout << sample_ids[i_a] << " " << sample_vafs[i_b] << std::endl;
+  }
 
   // Print name of result files:
   std::cout << std::endl;
