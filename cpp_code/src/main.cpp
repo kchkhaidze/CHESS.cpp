@@ -13,6 +13,7 @@
 #endif
 
 #include <getopt.h>
+#include <stdlib.h>
 #include <random>
 #include <cmath>
 #include <iostream>
@@ -28,7 +29,7 @@
 #include "Universe.hpp"
 #include "Cell.hpp"
 #include "CellType.hpp"
-
+#include "Shapes.hpp"
 
 
 // Params of old function simulateTumorGrowth2D

@@ -12,8 +12,8 @@ TARGET = cancer_gillespie_simulation
 
 all: $(TARGET)
 
-$(TARGET): src/main.cpp src/phylogeny.o src/universe.o src/cell.o src/cell_type.o src/Phylogeny.hpp src/Universe.hpp src/Cell.hpp src/CellType.hpp
-	$(CC) $(CFLAGS) $(CFLAGS_X11) src/phylogeny.o src/universe.o src/cell.o src/cell_type.o src/main.cpp -o $(TARGET)
+$(TARGET): src/main.cpp src/shapes.o src/phylogeny.o src/universe.o src/cell.o src/cell_type.o src/Phylogeny.hpp src/Universe.hpp src/Cell.hpp src/CellType.hpp src/Shapes.cpp src/Shapes.hpp
+	$(CC) $(CFLAGS) $(CFLAGS_X11) src/shapes.o src/phylogeny.o src/universe.o src/cell.o src/cell_type.o src/main.cpp -o $(TARGET)
 
 src/phylogeny.o: src/Phylogeny.cpp src/Phylogeny.hpp
 	$(CC) $(CFLAGS) -c src/Phylogeny.cpp -o src/phylogeny.o

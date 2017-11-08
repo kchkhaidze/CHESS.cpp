@@ -6,6 +6,7 @@
 class Cell;
 class CellType;
 class PhylogenyRoot;
+class Shape;
 
 // Includes: ///////////////////////////////////////////////////////////////////
 #include <vector>
@@ -36,6 +37,7 @@ class Universe {
     class Cell* RemoveCell (int, int, int);
     class CellType* NextReactionType(double&);
     std::vector< std::array<int, 3> > FreeNeighbours(int, int, int);
+    bool TakeSample(Shape*, std::vector <std::string>&, std::vector <float>&);
 
     // Setter functions:
     void IncrementTimeBy(float);

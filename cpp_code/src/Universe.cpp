@@ -6,10 +6,12 @@
 #endif
 
 #include "CellType.hpp"
+#include "Shapes.hpp"
 #include "Cell.hpp"
 #include "Universe.hpp"
 #include "Phylogeny.hpp"
-//#include <random>
+#include <random>
+#include <stdlib.h>
 #include <iostream>
 #include <string>
 #include <array>
@@ -172,6 +174,150 @@ std::vector< std::array<int, 3> > Universe::FreeNeighbours(int x, int y, int z){
   return result;
 }
 
+
+bool Universe::TakeSample(Shape* shape,
+                          std::vector <std::string>& rvOutputId,
+                          std::vector <float>& rvOutputVaf){
+
+  // Part 1 - Collection of samples. ////////////////////////////
+
+  // Debug messages:
+  D(std::cout << std::endl;)
+  D(std::cout << "###### Cell sampling ##########" << std::endl;)
+  D(std::cout << "  Collecting cells:" << std::endl;)
+
+  // Vector to store all current ancestries of sampled cells:
+  std::vector< std::vector <PhylogenyNode*> > vpAncestries;
+
+  // Counter for the number of sampled nodes:
+  int normal_samples = 0;
+  int tumour_samples = 0;
+
+  // Ints to store the next cell to pick:
+  int x, y, z;
+
+  while (shape->next_coordinate(x, y, z)) { // Get next location from shape.
+    if (mSpace[x][y][z] == 0) { // Check if location is empty
+      normal_samples++;
+
+      // Debug messages:
+      D(std::cout << "  Normal cell " << normal_samples << ": " << std::endl;)
+      D(std::cout << "    x: " << x << " y: " << y << " z:" << z << std::endl;)
+    } else { // selected location is not empty
+      // Push current ancestry into the vector
+      tumour_samples++;
+      vpAncestries.push_back(mSpace[x][y][z]->AssociatedNode()->NodeAncestry());
+
+      // Debug messages:
+      D(std::cout << "  Tumour cell " << tumour_samples << ": " << std::endl;)
+      D(std::cout << "    x: " << x << " y: " << y << " z:" << z << std::endl;)
+    }
+  }
+  // Debug messages:
+  D(std::cout << "###############################" << std::endl;)
+
+  // Part 2 - Interpretation of samples. ////////////////////////
+
+  // Debug messages:
+  D(std::cout << std::endl;)
+  D(std::cout << "#### Sample interpretation ####" << std::endl;)
+  D(std::cout << " Number of cells: " << std::endl;)
+  D(std::cout << "   Tumour: " << tumour_samples << std::endl;)
+  D(std::cout << "   Normal: " << normal_samples << std::endl;)
+  D(std::cout << std::endl;)
+
+  // By tracking back along the phylogenies from the end to the fron we will be
+  // able to calculate the VAF of all mutations at each sample generation.
+
+  // For each level store the mutation related data in the following arrays:
+  unsigned int node_ids[tumour_samples + 1];
+  unsigned int mutation_number[tumour_samples + 1];
+  unsigned int affected_cells[tumour_samples + 1];
+
+
+  bool any_new = true; // During each iteration use this mark new muts present
+  while (any_new) {
+    any_new = false;
+
+    // Reset all arrays for the current level of mutation related data:
+    for (int i = 0; i < tumour_samples + 1; i++) {
+      mutation_number[i] = 0;
+      affected_cells[i] = 0;
+      node_ids[i] = 0;
+    }
+
+    // Iterate over all ancestry vectors and collect the data:
+    for (std::vector< std::vector<PhylogenyNode*> >::size_type i = 0;
+         i < vpAncestries.size();
+         i++)
+    {
+
+      // Check that there are data in the current cells anyestry:
+      if (vpAncestries[i].size() > 0) {
+        // Mark that new data were present at the last level:
+        any_new = true;
+
+        // Index for the end of the currents cells ancestry:
+        std::vector<PhylogenyNode*>::size_type j = vpAncestries[i].size() - 1;
+
+        // Extract id of the last node of current ancestry:
+        unsigned int cid = vpAncestries[i][j]->Id();
+
+        // Insert data into the appropiate array elements:
+        for (int k = 0; k <= tumour_samples; k++) { // Search through the array
+          if (node_ids[k] == cid) { // Found at position k of arrays.
+            affected_cells[k]++;
+            break;
+          } else if (node_ids[k] == 0){ // Not present in array yet. Insert at end.
+            affected_cells[k]++;
+            node_ids[k] = cid;
+            mutation_number[k] = vpAncestries[i][j]->NumMutations();
+            break;
+          }
+        }
+
+        // Remove last element of vector:
+        vpAncestries[i].pop_back();
+      }
+    }
+
+    // Interpret all node sets at the current generation level:
+    for (int k = 0; k <= tumour_samples && node_ids[k] != 0; k++) {
+      //std::cout << "k: " << k << ", node_ids: " << node_ids[k]
+      //  << ", affected_cells: " <<  affected_cells[k]
+      //  << ", mutation_number: "<< mutation_number[k] << std::endl;
+
+      // Convert node id to a hex
+      std::stringstream out;
+      out << std::hex << node_ids[k];
+      std::string hex_node_id = out.str();
+
+      // Binomial sampling related:
+      // std::default_random_engine generator;
+      // int depth = 100;
+      float expected_vaf = 0.5 * affected_cells[k] / tumour_samples;
+      // std::binomial_distribution<int> distribution(depth, expect_freq);
+
+      // Sample each mutation in current node once:
+      for (int l = 0; l < mutation_number[k]; l++) {
+        // int alt = distribution(generator);
+        // int ref = depth - alt;
+        // float sampled_freq = alt * 1.0 / depth;
+
+        // Convert mutation id to a hex string:
+        out.str("");
+        out << std::hex << l;
+        std::string hex_mutation_id = out.str();
+
+        // Append mutation information to output vectors:
+        //std::cout << hex_node_id << "X" << hex_mutation_id << std::endl;
+        rvOutputId.push_back(hex_node_id + "X" + hex_mutation_id);
+        rvOutputVaf.push_back(expected_vaf);
+      }
+    }
+  }
+  return true;
+}
 
 // Setter functions:
 void Universe::IncrementTimeBy(float Delta){ mTime += Delta; }
@@ -361,7 +507,7 @@ void Universe::PutNodesToStream(PhylogenyNode* current_node,
   //PhylogenyNode* up = current_node->UpNode();
   PhylogenyNode* left = current_node->LeftNode();
   PhylogenyNode* right = current_node->RightNode();
-  Cell* cell = current_node->AssociatedCell();
+  //Cell* cell = current_node->AssociatedCell();
   //unsigned int up_id = (up == 0) ? 0 : up->Id();
   //unsigned int left_id = (left == 0) ? 0 : left->Id();
   //unsigned int right_id = (right == 0) ? 0 : right->Id();
