@@ -365,5 +365,10 @@ int main(int argc, char* argv[]) {
   } else {
     std::cerr << "Couldn't write histroy to csv file." << std::endl;
   }
+
+  // Wait for user to close output screen.
+  while (!disp.is_closed() && !disp.is_keyESC())
+    disp.wait();
+
   return EXIT_SUCCESS;
 }
