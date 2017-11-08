@@ -86,7 +86,7 @@ Cell* CellType::RandomMember() {
   D(std::cout << "  Next reaction member:" << std::endl;)
   D(std::cout << "    Member No: " << mpMembers[rm]->Id() << std::endl;)
   D(std::cout << "    Member: " << mpMembers[rm] << std::endl;)
-  D(std::cout << "    Type: " << this << std::endl;)
+  D(std::cout << "    Type: " << this->Id() << std::endl;)
   D(std::cout << "###############################" << std::endl;)
 
   return mpMembers[rm];
@@ -99,6 +99,8 @@ void CellType::RegisterMember(Cell* pCell){
 }
 
 void CellType::DeregisterMember(Cell* pCell){
+  D(std::cout << "Deregister member " << pCell << std::endl;)
+
   std::vector<Cell*>::iterator it;  // iterator for members vector.
 
   for (it = mpMembers.begin(); it != mpMembers.end(); ++it) { // iter over vector
