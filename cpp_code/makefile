@@ -27,5 +27,8 @@ src/cell.o: src/Cell.cpp src/Cell.hpp
 src/cell_type.o: src/CellType.cpp src/CellType.hpp
 	$(CC) $(CFLAGS) -c src/CellType.cpp -o src/cell_type.o
 
+src/shapes.o: src/Shapes.cpp src/Shapes.hpp
+	$(CC) $(CFLAGS) -c src/Shapes.cpp -o src/shapes.o
+
 clean:
 	$(RM) $(TARGET) src/phylogeny.o src/universe.o src/cell.o src/cell_type.o
