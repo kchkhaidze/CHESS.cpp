@@ -88,50 +88,113 @@ int main(int argc, char* argv[]) {
 
   // Parse commandline arguments (copied from getop man-page):
   while (true) {
-    int c = getopt_long(argc, argv, "x:y:z:M:w:m:t:f:A:B:R:o:s:", long_options, NULL);
+    int c = getopt_long(argc, argv, "x:y:z:M:w:m:t:f:A:B:R:o:s:", long_options,
+                        NULL);
 
     if (c == -1)
       break;
+
     switch (c) {
       case 'x':
-      size_x = atoi(optarg);
-      break;
+        size_x = atoi(optarg);
+        if (size_x <= 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Grid size along dimension x should be > 0.";
+          std::cout << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'y':
-      size_y = atoi(optarg);
-      break;
+        size_y = atoi(optarg);
+        if (size_y <= 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Grid size along dimension y should be > 0.";
+          std::cout << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'z':
-      size_z = atoi(optarg);
-      break;
+        size_z = atoi(optarg);
+        if (size_z <= 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Grid size along dimension z should be > 0.";
+          std::cout << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'M':
-      mutation_rate = atof(optarg);
-      break;
+        mutation_rate = atof(optarg);
+        if (mutation_rate < 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Mutation rate should be >= 0." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'w':
-      wildtype_birthrate = atof(optarg);
-      break;
+        wildtype_birthrate = atof(optarg);
+        if (wildtype_birthrate < 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Birth rates should be >= 0." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'm':
-      mutant_birthrate = atof(optarg);
-      break;
+        mutant_birthrate = atof(optarg);
+        if (mutant_birthrate < 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Birth rates should be >= 0." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 't':
-      clone_start_time = atof(optarg);
-      break;
+        clone_start_time = atof(optarg);
+        if (clone_start_time < 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Clone start time should be >= 0." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'f':
-      display_frequency = atof(optarg);
-      break;
+        display_frequency = atof(optarg);
+        if (display_frequency < 0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Display frequency should be >= 0." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'A':
-      alpha = atof(optarg);
-      break;
+        alpha = atof(optarg);
+        if (alpha < 0 || alpha > 1.0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Parameter alpha (A) should be 0 < A < 1.";
+          std::cout << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'B':
-      beta = atof(optarg);
-      break;
+        beta = atof(optarg);
+        if (beta < 0 || beta > 1.0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Parameter beta (B) should be 0 < B < 1.";
+          std::cout << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'R':
-      aggression = atof(optarg);
-      break;
+        aggression = atof(optarg);
+        if (aggression < 0 || aggression > 1.0) {
+          std::cout << "Error: " << std::endl;
+          std::cout << "  Parameter aggression (R) should be 0 < R < 1.";
+          std::cout << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        break;
       case 'o':
-      output_dir = atof(optarg);
-      break;
+        output_dir = atof(optarg);
+        break;
       case 's':
-      seed = atoi(optarg);
-      break;
+        seed = atoi(optarg);
+        break;
       case ':':
         break;
       case 'h':
