@@ -44,7 +44,7 @@
 #define BETA 1.0       // beta [float]
 #define AGGR 1.0       // cell aggression [float]
 #define CENTER(X) ((X + 1) / 2) - 1
-#define OUTPUT_DIR "output"
+#define OUTPUT_DIR "."
 #define SPACE_OUPUT_FILE_PREFIX "space"
 #define TYPES_OUPUT_FILE_PREFIX "types"
 #define PHYLO_OUPUT_FILE_PREFIX "phylo"
@@ -335,13 +335,13 @@ int main(int argc, char* argv[]) {
 
   // Write all results to output files:
   std::cout << "Dumping output" << std::endl;
-  universe.SpaceToCsvFile(output_dir + SPACE_OUPUT_FILE_PREFIX);
-  universe.TypesToCsvFile(output_dir + TYPES_OUPUT_FILE_PREFIX);
-  universe.PhylogeniesToFile(output_dir + PHYLO_OUPUT_FILE_PREFIX);
+  universe.SpaceToCsvFile(output_dir + "/" + SPACE_OUPUT_FILE_PREFIX);
+  universe.TypesToCsvFile(output_dir + "/" + TYPES_OUPUT_FILE_PREFIX);
+  universe.PhylogeniesToFile(output_dir + "/" + PHYLO_OUPUT_FILE_PREFIX);
 
   // Write history to another output file:
   std::ofstream output_stream;
-  output_stream.open(output_dir + HISTORY_OUPUT_FILE_PREFIX,
+  output_stream.open(output_dir + "/" + HISTORY_OUPUT_FILE_PREFIX,
                      std::ios::out | std::ios::trunc);
 
   if (output_stream.is_open()) {
