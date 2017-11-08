@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
     {"aggression",    optional_argument, 0,  'R'},
     {"output_dir",    optional_argument, 0,  'o'},
     {"seed",    optional_argument, 0,  's'},
+    {"help",    optional_argument, 0,  'h'},
     {NULL, 0, NULL, 0}
   };
 
@@ -133,9 +134,40 @@ int main(int argc, char* argv[]) {
       break;
       case ':':
         break;
+      case 'h':
       case '?':
         break;
-        std::cerr <<  "Usage: " << argv[0] << " [please fill]" << std::endl;
+        std::cout <<  "Usage: " << argv[0] << " [options]" << std::endl;
+        std::cout <<  "  Options: " << std::endl;
+        std::cout <<  "    -x N, --size_x=N              Grid size along\n";
+        std::cout <<  "                                  dimension x.\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -y N, --size_y=N              Grid size along\n";
+        std::cout <<  "                                  dimension y.\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -z N, --size_y=N              Grid size along\n";
+        std::cout <<  "                                  dimension z.\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -M MU, --mutation_rate=MU     Mutation rate.\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -w F, --wildtype_birthrate=F\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -m F, --mutant_birthrate=F\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -A F, --alpha=F\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -B F, --beta=F\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -R F, --aggression=F (0.0-1.0)\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -o DIR, --output_dir=DIR\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -f FREQ, --display_frequency=FREQ\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -s SEED, --seed=SEED\n";
+        std::cout <<  "\n";
+        std::cout <<  "    -h, --help                    Print this help\n";
+        std::cout << std::endl;
         exit(EXIT_FAILURE);
       default:
         std::cout << "getopt returned character code 0" << c << std::endl;
