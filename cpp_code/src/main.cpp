@@ -332,6 +332,17 @@ int main(int argc, char* argv[]) {
 
   cell_type_blue.RandomMember()->AssociatedNode()->PrintAncestry();
 
+  // Print name of result files:
+  std::cout << std::endl;
+  std::cout << "######### Information ##########" << std::endl;
+  std::cout << "  Output files: " << std::endl;
+  std::cout << "    Space: " << output_dir + "/" + SPACE_OUPUT_FILE_PREFIX
+    << "*" << std::endl;
+  std::cout << "    Types: " << output_dir + "/" + TYPES_OUPUT_FILE_PREFIX
+    << "*" << std::endl;
+  std::cout << "    Trees: " << output_dir + "/" + PHYLO_OUPUT_FILE_PREFIX
+    << "*" << std::endl;
+  std::cout << "################################" << std::endl;
 
   // Write all results to output files:
   std::cout << "Dumping output" << std::endl;
