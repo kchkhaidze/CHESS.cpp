@@ -66,6 +66,16 @@ PhylogenyNode* PhylogenyNode::UpNode() { return mpUp; };
 PhylogenyNode* PhylogenyNode::LeftNode() { return mpLeft; };
 PhylogenyNode* PhylogenyNode::RightNode() { return mpRight; };
 
+std::vector <PhylogenyNode*> PhylogenyNode::NodeAncestry(){
+  std::vector <PhylogenyNode*> result;
+  PhylogenyNode* pCurrent = this;
+  do {
+    result.push_back(pCurrent);
+  } while ((pCurrent = pCurrent->UpNode()) != 0);
+  return result;
+};
+
+
 // Setters:
 void PhylogenyNode::AddNewMutations(int num_new_mutations) {
   mNumMutsGeneration += num_new_mutations;

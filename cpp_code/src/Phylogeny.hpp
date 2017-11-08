@@ -51,6 +51,7 @@ class PhylogenyNode {
     PhylogenyNode* UpNode();
     PhylogenyNode* LeftNode();
     PhylogenyNode* RightNode();
+    std::vector <PhylogenyNode*> NodeAncestry();
 
     // Setters:
     void AddNewMutations(int);
