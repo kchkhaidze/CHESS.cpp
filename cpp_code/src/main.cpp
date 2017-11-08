@@ -331,7 +331,9 @@ int main(int argc, char* argv[]) {
   } // stop running after reaching limit of universe
 
 
-  cell_type_blue.RandomMember()->AssociatedNode()->PrintAncestry();
+  // Example of sampling a ancestry:
+  //cell_type_blue.RandomMember()->AssociatedNode()->PrintAncestry();
+
   // Example how to take samples:
   std::vector <std::string> sample_ids;
   std::vector <float> sample_vafs;
