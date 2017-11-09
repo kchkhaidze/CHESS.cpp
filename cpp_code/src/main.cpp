@@ -39,7 +39,7 @@
 #define MU 10          // mutation rate [float]
 #define WTBR 1         // wildtype birth rate [float]
 #define MUTBR 1.5        // mutant birth rate   [float]
-#define CLST 5.0       // clone start time [float]
+#define CLST 1.0       // clone start time [float]
 #define DISPFRQ 0.05   // display frequency [float]
 #define ALPHA 0.0      // alpha [float]
 #define BETA 1.0       // beta [float]
@@ -89,15 +89,15 @@ int main(int argc, char* argv[]) {
 
   // Parse commandline arguments (copied from getop man-page):
   while (true) {
-    int c = getopt_long(argc, argv, "x:y:z:M:w:m:t:f:A:B:R:o:s:", long_options,
-                        NULL);
+    int c = getopt_long(argc, argv, "x:y:z:M:w:m:t:f:A:B:R:o:s:",
+                        long_options, NULL);
 
     if (c == -1)
       break;
 
     switch (c) {
       case 'x':
-        size_x = atoi(optarg);
+        size_x = strtol(optarg, NULL, 10);
         if (size_x <= 0) {
           std::cout << "Error: " << std::endl;
           std::cout << "  Grid size along dimension x should be > 0.";
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
         }
         break;
       case 'y':
-        size_y = atoi(optarg);
+        size_y = strtol(optarg, NULL, 10);
         if (size_y <= 0) {
           std::cout << "Error: " << std::endl;
           std::cout << "  Grid size along dimension y should be > 0.";
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
         }
         break;
       case 'z':
-        size_z = atoi(optarg);
+        size_z = strtol(optarg, NULL, 10);
         if (size_z <= 0) {
           std::cout << "Error: " << std::endl;
           std::cout << "  Grid size along dimension z should be > 0.";
@@ -200,43 +200,77 @@ int main(int argc, char* argv[]) {
         break;
       case 'h':
       case '?':
-        break;
+        std::cout <<  "\n";
         std::cout <<  "Usage: " << argv[0] << " [options]" << std::endl;
         std::cout <<  "  Options: " << std::endl;
-        std::cout <<  "    -x N, --size_x=N              Grid size along\n";
-        std::cout <<  "                                  dimension x.\n";
         std::cout <<  "\n";
-        std::cout <<  "    -y N, --size_y=N              Grid size along\n";
-        std::cout <<  "                                  dimension y.\n";
+        std::cout <<  "    -x N, --size_x=N\n";
+        std::cout <<  "        Size of dimension x.\n";
+        std::cout <<  "          default: " << SIZE_X << std::endl;
         std::cout <<  "\n";
-        std::cout <<  "    -z N, --size_y=N              Grid size along\n";
-        std::cout <<  "                                  dimension z.\n";
+        std::cout <<  "    -y N, --size_y=N\n";
+        std::cout <<  "        Size of dimension y.\n";
+        std::cout <<  "          default: " << SIZE_Y << std::endl;
         std::cout <<  "\n";
-        std::cout <<  "    -M MU, --mutation_rate=MU     Mutation rate.\n";
+        std::cout <<  "    -z N, --size_z=N\n";
+        std::cout <<  "        Size of dimension z.\n";
+        std::cout <<  "          default: " << SIZE_Y << std::endl;
+        std::cout <<  "\n";
+        std::cout <<  "    -M MU, --mutation_rate=MU\n";
+        std::cout <<  "        Mutation rate. Number of new mutations\n";
+        std::cout <<  "        will drawn randomly from a Poisson \n";
+        std::cout <<  "        distribution with lambda = MU during\n";
+        std::cout <<  "        each division.\n";
+        std::cout <<  "          default: " << MU << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -w F, --wildtype_birthrate=F\n";
+        std::cout <<  "        Birth rate of wildtype cells (blue).\n";
+        std::cout <<  "          default: " << WTBR << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -m F, --mutant_birthrate=F\n";
+        std::cout <<  "        Birth rate of mutated cells (red).\n";
+        std::cout <<  "          default: " << MUTBR << std::endl;
+        std::cout <<  "\n";
+        std::cout <<  "    -t F, --clone_start_time=F\n";
+        std::cout <<  "        Time mutant clone is introduced.\n";
+        std::cout <<  "          default: " << CLST << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -A F, --alpha=F\n";
+        std::cout <<  "        Death rate of father cells prior to";
+        std::cout <<  "        division.\n";
+        std::cout <<  "          default: " << ALPHA << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -B F, --beta=F\n";
+        std::cout <<  "        Death rate of daughter cell after\n";
+        std::cout <<  "        division.\n";
+        std::cout <<  "          default: " << BETA << std::endl;
         std::cout <<  "\n";
-        std::cout <<  "    -R F, --aggression=F (0.0-1.0)\n";
+        std::cout <<  "    -R F, --aggression=F\n";
+        std::cout <<  "        Probabilty of cells to push.\n";
+        std::cout <<  "          default: " << AGGR << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -o DIR, --output_dir=DIR\n";
+        std::cout <<  "        Output directory.\n";
+        std::cout <<  "          default: " << OUTPUT_DIR << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -f FREQ, --display_frequency=FREQ\n";
+        std::cout <<  "        Update frequency of the display.\n";
+        std::cout <<  "          default: " << DISPFRQ << std::endl;
         std::cout <<  "\n";
         std::cout <<  "    -s SEED, --seed=SEED\n";
+        std::cout <<  "        Random seed.\n";
+        std::cout <<  "          default: time(NULL)" << std::endl;
         std::cout <<  "\n";
-        std::cout <<  "    -h, --help                    Print this help\n";
+        std::cout <<  "    -h, --help\n";
+        std::cout <<  "        Print this help\n";
         std::cout << std::endl;
         exit(EXIT_FAILURE);
+	      break;
       default:
-        std::cout << "getopt returned character code 0" << c << std::endl;
+        std::cout << " returned character code 0" << c << std::endl;
     }
   }
+
 
   // Print arguments:
   std::cout << std::endl;
