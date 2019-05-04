@@ -1,0 +1,3 @@
+useDynLib(CHESS, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+import(Rcpp,methods,ape,magrittr,data.table,transport)

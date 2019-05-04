@@ -1,0 +1,2 @@
+PKG_CPPFLAGS = -I /usr/local/include
+CXX_STD = CXX11

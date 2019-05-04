@@ -1,0 +1,15 @@
+Package: CHESS
+Type: Package
+Title: Cancer Heterogeneity with Spatial Simulations (CHESS).
+Version: 0.0.0.9000
+Date: 2018-01-22
+Authors@R: as.person(c(
+    "Kate Chkhaidze <Kate.Chkhaidze@icr.ac.uk> [aut, cre]",
+    "Timon Heide <timon.heide@icr.ac.uk> [aut]"))
+Description: ...
+LazyLoad: yes
+Imports: methods, Rcpp (>= 0.12.14), ape (>= 5.0), magrittr (>= 1.5), data.table (>= 1.11.4), transport (>= 0.9-4)
+LinkingTo: Rcpp
+RcppModules: Universe
+RoxygenNote: 6.1.1
+Encoding: UTF-8
